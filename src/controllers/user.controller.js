@@ -7,6 +7,7 @@ import { User } from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import mongoose from "mongoose";
 
+
 const generateAccessAndRefreshTokens = (user) => {
     try {
         const accessToken = user.generateAccessToken();
@@ -51,7 +52,7 @@ const registerUser = asyncHandler(async (req, res, _) => {
         throw new ApiError(409, "Username or email already exists");
     }
 
-    // AVATAR
+    // -------------------------------- AVATAR ---------------------------------------
     const avatarLocalPath = req.files?.avatar?.[0]?.path;
 
     if (!avatarLocalPath) {
@@ -70,7 +71,7 @@ const registerUser = asyncHandler(async (req, res, _) => {
     newUser.avatar = avatarUploadResult.secure_url;
 
 
-    // COVER IMAGE (optional)
+    // -------------------------------- COVER IMAGE (optional) -------------------------------- 
     const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
     if (coverImageLocalPath) {
         // Upload coverImage to Cloudinary

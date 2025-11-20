@@ -13,14 +13,14 @@ import {
     getChannalDetails,
     getWatchHistory
 } from "../controllers/user.controller.js";
-import { upload } from "../middlewares/multer.middle.js";
+import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
 // localhost:3000/api/users/register
 router.route("/register").post(
-    upload.fields([    // middleware to handle multiple file uploads
+    upload("image").fields([    // middleware to handle multiple file uploads
         { name: "avatar", maxCount: 1 },
         { name: "coverImage", maxCount: 1 }
     ]),
@@ -46,14 +46,14 @@ router.route("/get-user").get(verifyJWT, getUser);
 router.route("/update-user-details").patch(verifyJWT, updateUserDetails);
 
 router.route("/update-user-avatar").patch(
-    verifyJWT, 
-    upload.single("avatar"),
+    verifyJWT,
+    upload("image").single("avatar"),
     updateUserAvatar
 );
 
 router.route("/update-user-coverimage").patch(
-    verifyJWT, 
-    upload.single("coverimage"),
+    verifyJWT,
+    upload("image").single("coverimage"),
     updateUserCoverImage
 );
 

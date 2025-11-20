@@ -9,6 +9,8 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+
+    if (limit - page > 20) throw new ApiError(400, "Cannot fetch more than 20 videos at a time");
     // get all videos(thumbnail url, title, duration) based on query, sort, pagination
 
     res.status(200).json(new ApiResponse(200, "OK"));
@@ -16,12 +18,16 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
 const uploadVideo = asyncHandler(async (req, res) => {
     const { title, description } = req.body
-    // verify user
     // get video from multer
-    // check it is video
+    const videoPath = req.files?.videoFile?.[0]?.path;
+
+    if (!videoPath) throw new ApiError(422, "Video file is required");
+
     // upload video to cloudinary
     // get video info - duration
     // create video document
+
+    res.status(201).json(new ApiResponse(201, "Video uploaded successfully"));
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
