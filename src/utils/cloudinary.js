@@ -14,12 +14,13 @@ const uploadOnCloudinary = async (filePath) => {  // getting file local path
             throw new Error('File path is required for upload');
         }
 
-        const result = await cloudinary.uploader.upload(filePath);
+        const result = await cloudinary.uploader.upload(filePath, { resource_type: "auto" });
 
         // delete the file from local storage after upload
         fs.unlinkSync(filePath);
-        console.log('Cloudinary :: File uploaded:', result.url);
         
+        // console.log('Cloudinary :: File uploaded:', result.url);
+
         return result;
 
     } catch (error) {
@@ -27,7 +28,7 @@ const uploadOnCloudinary = async (filePath) => {  // getting file local path
         fs.unlinkSync(filePath);
 
         console.error('Error uploading to Cloudinary:', error);
-        throw new Error('Cloudinary :: upload failed');
+        throw new Error('Cloudinary :: upload failed: ' + error.message);
     }
 }
 
