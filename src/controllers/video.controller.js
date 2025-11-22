@@ -4,19 +4,56 @@ import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import asyncHandler from "../utils/asyncHandler.js"
-import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+  const { page = 1, number = 10, query, sortBy = { createdAt: -1 }, sortType, userId } = req.query;
 
-  if (limit - page > 20) throw new ApiError(400, "Cannot fetch more than 20 videos at a time");
+  if (number > 20) throw new ApiError(422, "number can be maximum 20");
+  if (!sortBy) throw new ApiError(422, "sortBy should be json like {createdAt: -1} means most recent");
+
   // get all videos(thumbnail url, title, duration) based on query, sort, pagination
 
-  res.status(200).json(new ApiResponse(200, "OK"));
+  const filter = { visibility: true };
+
+  // -------------------------------- SIMPLE AND PIPELINE METHOD --------------------------
+
+  // const skip = (page - 1) * number;
+
+  // const videos = await Video.find().skip(skip).limit(number).sort(sortBy); // SIMPLE WAY
+
+  // const videos = await Video.aggregate([ //  PIPELINE WAY
+  //   {
+  //     $match: filter
+  //   },
+  //   {
+  //     $skip: skip
+  //   },
+  //   {
+  //     $limit: number
+  //   },
+  //   {
+  //     $sort: sortBy
+  //   }
+  // ]);
+
+  // 'mongoose-aggregate-paginate-v2' WAY  -->  Aggregate + Paginate
+
+  const aggregate = Video.aggregate([{ $match: filter }]);
+  const options = {
+    page,
+    limit: number,
+    sort: sortBy,
+  };
+
+  const videos = await Video.aggregatePaginate(aggregate, options);
+
+  res.status(200).json(new ApiResponse(200, "Fetched successfully", videos));
 })
 
 const uploadVideo = asyncHandler(async (req, res) => {
+  console.log("UPLOAD VIDEO");
   const { title, description, visibility = true } = req.body;
 
   const videoInfo = {
@@ -41,6 +78,8 @@ const uploadVideo = asyncHandler(async (req, res) => {
   const thumbnailPath = req.files?.thumbnail?.[0]?.path;
   if (!thumbnailPath) throw new ApiError(422, "Thumbnail file is required");
 
+  console.log("All Validation passed ✅");
+
 
   // -------------------------------- VIDEO -------------------------------- 
 
@@ -49,8 +88,11 @@ const uploadVideo = asyncHandler(async (req, res) => {
 
   if (!videoFileUploadResult?.playback_url) throw new ApiError(500, "Failed to upload video on cloudinary");
 
+  console.log("Video uploaded on cloudinary ✅");
+
   // Set videoInfo.filePath
   videoInfo.videoPath = videoFileUploadResult.playback_url;
+  videoInfo.video_public_id = videoFileUploadResult.public_id;
 
   // -------------------------------- THUMBNAIL -------------------------------- 
 
@@ -59,8 +101,11 @@ const uploadVideo = asyncHandler(async (req, res) => {
 
   if (!thumbnailFileUploadResult?.secure_url) throw new ApiError(500, "Failed to upload thumbnail on cloudinary");
 
+  console.log("Thumbnail uploaded on cloudinary ✅");
+
   // Set videoInfo.thumbnail
   videoInfo.thumbnail = thumbnailFileUploadResult.secure_url;
+  videoInfo.thumbnail_public_id = thumbnailFileUploadResult.public_id;
 
   // -------------------------------- SET INFO -------------------------------- 
   videoInfo.duration = videoFileUploadResult.duration;
@@ -68,30 +113,71 @@ const uploadVideo = asyncHandler(async (req, res) => {
   // create video document
   const video = await Video.create(videoInfo);
 
+  if (!video) throw new ApiError(500, "Failed to create video document on mongodb");
+
   res.status(201).json(new ApiResponse(201, "Video uploaded successfully", video));
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
-  const { videoId } = req.params;
+  const { videoId } = req.query;
+  console.log(isValidObjectId(videoId))
 
   if (!videoId) throw new ApiError(422, "Video ID is required");
+  if (!isValidObjectId(videoId.toString())) throw new ApiError(422, "Video ID is not valid");
 
   // Get video url from document
   const video = await Video.findById(videoId);
-  console.log("Video: ", video);
 
   if (!video) throw new ApiError(400, "Can't find video");
 
   res.status(200).json(new ApiResponse(200, "Video fetched successfully", video));
-})
+});
 
 const deleteVideo = asyncHandler(async (req, res) => {
-  const { videoId } = req.params
-  // Verify user
+  console.log("DELETE VIDEO");
+  const { videoId } = req.query;
+
+  if (!videoId) throw new ApiError(422, "videoId is required");
+  if (!isValidObjectId(videoId)) throw new ApiError(422, "videoId is not valid");
+
+  // Get user info
+  const user = req.user;
+
+  // Get video docu
+  const video = await Video.findById(videoId);
+
+  if (!video && !video?.owner) throw new ApiError(422, "Can't find video");
+
+  console.log("Video found ✅");
+
   // Match user with video owner
+  if (video.owner._id.toString() !== user._id.toString()) throw new ApiError(403, "You are not the owner of video");
+
+  console.log("You are the owner ✅");
+
+  console.log("Delete video: " + video.video_public_id)
+  console.log("Delete thumbnail: " + video.thumbnail_public_id)
+
+  // Delete video and thumbnail from cloudinary
+  const deleteThumbnailResult = await deleteOnCloudinary(video.thumbnail_public_id, "image");
+  const deleteVideoResult = await deleteOnCloudinary(video.video_public_id, "video");
+
+  console.log("delete video result: ", deleteVideoResult, " thumbnail: ", deleteThumbnailResult)
+
+  if (!(deleteVideoResult.result === "ok" && deleteThumbnailResult.result === "ok")) {
+    throw new ApiError(500, "Can't delete from cloudinary");
+  }
+
+  console.log("Delete from cloundinary ✅");
+
   // delete video document from DB
-  // delete video from cloudinary
-})
+  // const response = await Video.deleteOne({ _id: videoId });
+
+  // console.log("response after deleting video document:", response);
+
+  res.status(200).json(new ApiResponse(200, "Deleted successfully"));
+
+});
 
 export {
   getAllVideos,
@@ -100,6 +186,8 @@ export {
   deleteVideo,
 }
 
+
+// VIDEO document
 /* 
 uploaded video:  {
   asset_id: 'f25c92fb5fccf7a777e5b458c0f2e1f9',

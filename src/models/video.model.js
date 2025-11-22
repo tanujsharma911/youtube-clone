@@ -40,6 +40,14 @@ const videoSchema = new mongoose.Schema(
             ref: "User",
             required: [true, "Owner is required"]
         },
+        video_public_id: {
+            type: String,
+            required: [true, "video_public_id is required"]
+        },
+        thumbnail_public_id: {
+            type: String,
+            required: [true, "thumbnail_public_id is required"]
+        }
     },
     {
         timestamps: true

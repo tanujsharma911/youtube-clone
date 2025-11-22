@@ -30,9 +30,9 @@ router.route("/").post(
     uploadVideo
 );
 
-router.route("/:videoId").get(getVideoById)
+router.route("/getById").get(getVideoById)
 
-router.route("/:videoId").delete(verifyJWT, deleteVideo)
+router.route("/").delete(verifyJWT, deleteVideo)
 
 
 export default router
