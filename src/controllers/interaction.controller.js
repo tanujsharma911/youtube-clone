@@ -73,7 +73,7 @@ const getVideoInteractions = asyncHandler(async (req, res) => {
         {
             $group: {
                 _id: "$action",
-                user: {
+                users: {
                     $push: {
                         user_id: "$user_id",
                         createdAt: "$createdAt",
@@ -88,9 +88,9 @@ const getVideoInteractions = asyncHandler(async (req, res) => {
         {
             $lookup: {
                 from: "users",
-                localField: "user.user_id",
+                localField: "users.user_id",
                 foreignField: "_id",
-                as: "user.meta"
+                as: "users"
             }
         },
 
@@ -98,11 +98,11 @@ const getVideoInteractions = asyncHandler(async (req, res) => {
             $project: {
                 "_id": 1,
                 "length": 1,
-                "user.meta._id": 1,
-                "user.meta.avatar": 1,
-                "user.meta.createdAt": 1,
-                "user.meta.username": 1,
-                "user.meta.fullName": 1
+                "users._id": 1,
+                "users.avatar": 1,
+                "users.createdAt": 1,
+                "users.username": 1,
+                "users.fullName": 1
             }
         }
     ]);
@@ -111,9 +111,45 @@ const getVideoInteractions = asyncHandler(async (req, res) => {
 });
 
 const getLikedVideos = asyncHandler(async (req, res) => {
-    //TODO: get all interacted videos
+    //TODO: get all interacted videos matching user_id
 
-    res.status(200).json(new ApiResponse(200, "here is the all liked videos"));
+    const videos = await Interaction.aggregate([
+        {
+            $match: {
+                user_id: req.user._id,
+                action: 1
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "video",
+                foreignField: "_id",
+                as: "meta"
+            }
+        },
+        {
+            $unwind: "$meta"
+        },
+        {
+            $project: {
+                "_id": 1,
+                "action": 1,
+                "createdAt": 1,
+                "video_id": "$meta._id",
+                "thumbnail": "$meta.thumbnail",
+                "title": "$meta.title",
+                "visibility": "$meta.visibility",
+            }
+        },
+        {
+            $sort: {
+                createdAt: -1
+            }
+        }
+    ]);
+
+    res.status(200).json(new ApiResponse(200, "here is the all liked videos", videos));
 });
 
 const toggleCommentInteraction = asyncHandler(async (req, res) => {
