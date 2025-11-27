@@ -14,6 +14,15 @@ const commentSchema = new mongoose.Schema(
         owner: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
+        },
+        comment_to: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Comment",
+            required: false
+        },
+        replies: {
+            type: Number,
+            default: 0
         }
     },
     {

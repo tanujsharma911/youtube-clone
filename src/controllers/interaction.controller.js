@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import asyncHandler from "../utils/asyncHandler.js"
 import { Interaction } from "../models/interactions.model.js";
 import { Video } from "../models/video.model.js";
+import { Comment } from "../models/comment.model.js";
 
 const toggleVideoInteraction = asyncHandler(async (req, res) => {
     const { videoId, action } = req.query;
@@ -111,7 +112,6 @@ const getVideoInteractions = asyncHandler(async (req, res) => {
 });
 
 const getLikedVideos = asyncHandler(async (req, res) => {
-    //TODO: get all interacted videos matching user_id
 
     const videos = await Interaction.aggregate([
         {
@@ -153,10 +153,58 @@ const getLikedVideos = asyncHandler(async (req, res) => {
 });
 
 const toggleCommentInteraction = asyncHandler(async (req, res) => {
-    //TODO: get all interacted videos
-    const { commentId } = req.query;
+    const { commentId, videoId, action } = req.query;
 
-    res.status(200).json(new ApiResponse(200, "toggle comment interaction done: " + commentId));
+    if (!commentId) throw new ApiError(422, "Comment id is requried");
+    if (!isValidObjectId(commentId)) throw new ApiError(422, "Comment id is not valid");
+    if (!videoId) throw new ApiError(422, "Video id is requried");
+    if (!isValidObjectId(videoId)) throw new ApiError(422, "Video id is not valid");
+
+    //find comment in db
+    const comment = await Comment.findById(commentId);
+    if (!comment) throw new ApiError(422, "Comment does not exist");
+
+    const user = req.user;
+
+    const userInteraction = await Interaction.findOne({ user_id: user._id.toString(), comment: commentId });
+
+    // if user not interacted
+    if (!userInteraction) {
+
+        let interactionDoc = {
+            comment: commentId,
+            user_id: user._id,
+            video: videoId,
+            action,
+        };
+        const interactionResult = await Interaction.create(interactionDoc);
+
+        if (!interactionResult) throw new ApiError(500, "Can't create user interaction");
+
+        res.status(200).json(new ApiResponse(200, "Comment interaction created: " + commentId, interactionResult));
+        return;
+    }
+    else {
+
+        // if prev action is same as new, delete it
+        if (String(userInteraction.action) === String(action)) {
+            const deleteResult = await Interaction.deleteOne({ _id: userInteraction._id });
+
+            if (deleteResult.acknowledged !== true) throw new ApiError(500, "Can't delete document");
+
+            res.status(200).json(new ApiResponse(200, "Comment interaction deleted: " + commentId, deleteResult));
+            return;
+        }
+
+        // else update it with new action given
+        else {
+            const updateResult = await Interaction.updateOne({ _id: userInteraction._id }, { $set: { action: action } });
+            if (!updateResult) throw new ApiError(500, "Can't update user interaction");
+
+            res.status(200).json(new ApiResponse(200, "Comment interaction updated prev: " + userInteraction.action + " new: " + action, updateResult));
+            return;
+        }
+    }
 });
 
 export {
