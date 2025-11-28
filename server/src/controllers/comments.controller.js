@@ -6,7 +6,6 @@ import asyncHandler from "../utils/asyncHandler.js"
 import { Video } from "../models/video.model.js"
 
 const getVideoComments = asyncHandler(async (req, res) => {
-    //TODO: get all comments for a video
     const { videoId, page = 1, limit = 10, sortBy = { createdAt: -1 } } = req.query;
 
     if (!videoId) throw new ApiError(422, "videoId is required");
@@ -54,7 +53,6 @@ const getVideoComments = asyncHandler(async (req, res) => {
 });
 
 const getCommentReplies = asyncHandler(async (req, res) => {
-    //TODO: get all replies for a comment
     const { commentId, page = 1, limit = 10, sortBy = { createdAt: -1 } } = req.query;
 
     if (!commentId) throw new ApiError(422, "commentId is required");
@@ -140,7 +138,6 @@ const addComment = asyncHandler(async (req, res) => {
 });
 
 const updateComment = asyncHandler(async (req, res) => {
-    // TODO: update a comment
     const { commentId, message } = req.query;
 
     if (!commentId) throw new ApiError(422, "commentId is required");
@@ -163,7 +160,6 @@ const updateComment = asyncHandler(async (req, res) => {
 });
 
 const deleteComment = asyncHandler(async (req, res) => {
-    // TODO: delete a comment
     const { commentId } = req.query;
 
     if (!commentId) throw new ApiError(422, "commentId is required");

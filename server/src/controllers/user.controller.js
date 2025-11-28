@@ -19,7 +19,7 @@ const generateAccessAndRefreshTokens = (user) => {
     }
 }
 
-const registerUser = asyncHandler(async (req, res, _) => {
+const registerUser = asyncHandler(async (req, res) => {
 
     // Extract body data and file paths from req
     const newUser = {
@@ -107,7 +107,7 @@ const registerUser = asyncHandler(async (req, res, _) => {
 
 });
 
-const loginUser = asyncHandler(async (req, res, _) => {
+const loginUser = asyncHandler(async (req, res) => {
     // get username/email and password from req body
     const { identifier, password } = req.body; // identifier can be username or email
 
@@ -157,7 +157,7 @@ const loginUser = asyncHandler(async (req, res, _) => {
 
 });
 
-const logoutUser = asyncHandler(async (req, res, _) => {
+const logoutUser = asyncHandler(async (req, res) => {
     // Clear refresh token from DB
     await User.findByIdAndUpdate(
         req.user._id,
@@ -182,7 +182,7 @@ const logoutUser = asyncHandler(async (req, res, _) => {
         .json(new ApiResponse(200, "Logout successful"));
 });
 
-const refreshAccessToken = asyncHandler(async (req, res, _) => {
+const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken;
 
     if (!incomingRefreshToken) {
@@ -230,7 +230,7 @@ const refreshAccessToken = asyncHandler(async (req, res, _) => {
     }
 });
 
-const changePassword = asyncHandler(async (req, res, _) => {
+const changePassword = asyncHandler(async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
@@ -263,13 +263,13 @@ const changePassword = asyncHandler(async (req, res, _) => {
     res.status(200).json(new ApiResponse(200, "Password changed successfully"));
 });
 
-const getUser = asyncHandler(async (req, res, _) => {
+const getUser = asyncHandler(async (req, res) => {
     return res.status(200).json(
         new ApiResponse(200, "User fetched successfully", req.user)
     );
 });
 
-const updateUserDetails = asyncHandler(async (req, res, _) => {
+const updateUserDetails = asyncHandler(async (req, res) => {
     // get update data from req body
     const { username, email, fullName } = req.body;
 

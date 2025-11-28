@@ -7,7 +7,8 @@ import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-  const { page = 1, number = 10, query, sortBy = { createdAt: -1 }, sortType, userId } = req.query;
+  //TODO: search video by query
+  const { page = 1, number = 10, sortBy = { createdAt: -1 }, userId } = req.query;
 
   if (number > 20) throw new ApiError(422, "number can be maximum 20");
   if (!sortBy) throw new ApiError(422, "sortBy should be json like {createdAt: -1} means most recent");
@@ -16,28 +17,11 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
   const filter = { visibility: true };
 
-  // -------------------------------- SIMPLE AND PIPELINE METHOD --------------------------
+  if(userId) {
+    if(!isValidObjectId(userId)) throw new ApiError(422, "userId is not valid");
 
-  // const skip = (page - 1) * number;
-
-  // const videos = await Video.find().skip(skip).limit(number).sort(sortBy); // SIMPLE WAY
-
-  // const videos = await Video.aggregate([ //  PIPELINE WAY
-  //   {
-  //     $match: filter
-  //   },
-  //   {
-  //     $skip: skip
-  //   },
-  //   {
-  //     $limit: number
-  //   },
-  //   {
-  //     $sort: sortBy
-  //   }
-  // ]);
-
-  // 'mongoose-aggregate-paginate-v2' WAY  -->  Aggregate + Paginate
+    filter.owner = userId;
+  }
 
   const aggregate = Video.aggregate([{ $match: filter }]);
   const options = {
