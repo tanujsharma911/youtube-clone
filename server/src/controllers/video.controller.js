@@ -17,13 +17,46 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
   const filter = { visibility: true };
 
-  if(userId) {
-    if(!isValidObjectId(userId)) throw new ApiError(422, "userId is not valid");
+  if (userId) {
+    if (!isValidObjectId(userId)) throw new ApiError(422, "userId is not valid");
 
     filter.owner = userId;
   }
 
-  const aggregate = Video.aggregate([{ $match: filter }]);
+  const aggregate = Video.aggregate([
+    {
+      $match: filter
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner"
+      }
+    },
+    {
+      $unwind: "$owner"
+    },
+    {
+      $project: {
+        videoPath: 1,
+        thumbnail: 1,
+        title: 1,
+        description: 1,
+        duration: 1,
+        views: 1,
+        owner: {
+          _id: 1,
+          username: 1,
+          avatar: 1,
+          fullName: 1
+        },
+        createdAt: 1,
+        updatedAt: 1
+      }
+    }
+  ]);
   const options = {
     page,
     limit: number,

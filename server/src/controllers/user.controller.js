@@ -153,7 +153,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
     res.cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
-        .status(200).json(new ApiResponse(200, "Login successful", { user, accessToken, refreshToken }));
+        .status(200).json(new ApiResponse(200, "Login successful", user));
 
 });
 
@@ -264,6 +264,7 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 
 const getUser = asyncHandler(async (req, res) => {
+    console.log("Fetching user data:", req.user);
     return res.status(200).json(
         new ApiResponse(200, "User fetched successfully", req.user)
     );
