@@ -1,17 +1,14 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { Outlet } from "react-router";
 
-import SidebarPanel from "./components/SidePanel";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
-    <div>
-      <SidebarProvider>
-        <SidebarPanel />
-        <main className="p-5">
-          <Outlet />
-        </main>
-      </SidebarProvider>
+    <div className="flex flex-col h-screen">
+      <Navbar />
+      <div className="px-5 md:px-20 mt-20">
+        <Outlet />
+      </div>
     </div>
   );
 }

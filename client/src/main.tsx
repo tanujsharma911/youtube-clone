@@ -5,7 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "./index.css";
 import App from "./App.tsx";
-import Home from "./components/Home.tsx";
+import Home from "./pages/Home.tsx";
+import Login from "./pages/Login.tsx";
+import AuthLayout from "./components/AuthLayout.tsx";
+import Account from "./pages/Account.tsx";
 
 const router = createBrowserRouter([
   {
@@ -16,18 +19,18 @@ const router = createBrowserRouter([
         path: "/",
         element: <Home />,
       },
-      // {
-      //   path: "/login",
-      //   element: (
-      //     <AuthLayout authenticationRequired={false}>
-      //       <Login />
-      //     </AuthLayout>
-      //   ),
-      // },
+      {
+        path: "/login",
+        element: (
+          <AuthLayout authRequired={false}>
+            <Login />
+          </AuthLayout>
+        ),
+      },
       // {
       //   path: "/signup",
       //   element: (
-      //     <AuthLayout authenticationRequired={false}>
+      //     <AuthLayout authRequired={false}>
       //       <Signup />
       //     </AuthLayout>
       //   ),
@@ -41,15 +44,14 @@ const router = createBrowserRouter([
       //     </AuthLayout>
       //   ),
       // },
-      // {
-      //   path: "/account",
-      //   element: (
-      //     <AuthLayout authenticationRequired>
-      //       {" "}
-      //       <Account />
-      //     </AuthLayout>
-      //   ),
-      // },
+      {
+        path: "/account",
+        element: (
+          <AuthLayout authRequired>
+            <Account />
+          </AuthLayout>
+        ),
+      },
       // {
       //   path: "/edit-post/:slug",
       //   element: (
