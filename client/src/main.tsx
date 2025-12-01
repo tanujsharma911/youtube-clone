@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+// import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import Home from "./pages/Home.tsx";
 import Login from "./pages/Login.tsx";
 import AuthLayout from "./components/AuthLayout.tsx";
 import Account from "./pages/Account.tsx";
+import Upload from "./pages/Upload.tsx";
 
 const router = createBrowserRouter([
   {
@@ -35,15 +36,14 @@ const router = createBrowserRouter([
       //     </AuthLayout>
       //   ),
       // },
-      // {
-      //   path: "/create-article",
-      //   element: (
-      //     <AuthLayout authenticationRequired>
-      //       {" "}
-      //       <AddPost />
-      //     </AuthLayout>
-      //   ),
-      // },
+      {
+        path: "/v/upload",
+        element: (
+          <AuthLayout authRequired>
+            <Upload />
+          </AuthLayout>
+        ),
+      },
       {
         path: "/account",
         element: (
@@ -72,9 +72,7 @@ const router = createBrowserRouter([
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  </StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+  </QueryClientProvider>
 );

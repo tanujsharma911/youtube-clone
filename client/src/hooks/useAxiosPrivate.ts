@@ -10,14 +10,6 @@ const useAxiosPrivate = () => {
   useEffect(() => {
     const requestIntercept = axiosPrivate.interceptors.request.use(
       (config) => {
-        // Add Authorization header if not already present
-        if (!config.headers["Authorization"]) {
-          config.headers["Authorization"] = `Bearer ${user?.data?.accessToken}`;
-          console.log(
-            "Added Authorization header to request",
-            `Bearer ${user?.data?.accessToken}`
-          );
-        }
         return config;
       },
       (error) => Promise.reject(error)
@@ -26,17 +18,22 @@ const useAxiosPrivate = () => {
     const responseIntercept = axiosPrivate.interceptors.response.use(
       (response) => response,
       async (error) => {
-        const prevRequest = error?.config;
+        const prevRequest = error?.config; // Original request
 
         if (error?.response?.status === 401 && !prevRequest?.sent) {
-          prevRequest.sent = true;
+          // Unauthorized on first try
+          console.log(
+            "👉 useAxiosPrivate :: First response :: unauthorized error -> trying to refresh token"
+          );
+          prevRequest.sent = true; // Mark first request as sent
 
-          const newUserData = await refresh();
+          const newUserData = await refresh(); // Try to refresh token
 
           if (newUserData) {
-            prevRequest.headers[
-              "Authorization"
-            ] = `Bearer ${newUserData.token}`;
+            console.log(
+              "👉 useAxiosPrivate :: Second response :: Token refreshed -> retrying original request"
+            );
+            // Retry original request with new token
             return axiosPrivate(prevRequest);
           }
         }

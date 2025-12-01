@@ -2,24 +2,23 @@ import axios from "../api/axios";
 import useAuth from "@/store/auth";
 
 const useRefreshToken = () => {
-  const { user, login } = useAuth();
+  const { login } = useAuth();
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/users/refresh-token", {
-        withCredentials: true,
-      });
+      const response = await axios.post("/users/refresh-token");
 
       const userData = response.data;
 
-      console.log("Refreshed user data:", userData);
-      console.log("useAuth user data:", user);
-
-      login(userData);
+      login(userData.data);
 
       return userData;
     } catch (error) {
-      console.error("Failed to refresh token:", error);
+      console.log(
+        "👉 useRefreshToken :: Failed to refresh token -> because of first visit",
+        error
+      );
+      // console.error("Failed to refresh token -> because first visit", error);
       return null;
     }
   };

@@ -185,35 +185,36 @@ const logoutUser = asyncHandler(async (req, res) => {
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken;
 
+
     if (!incomingRefreshToken) {
         throw new ApiError(401, "Refresh token is required");
     }
-
-    console.log("incoming refresh: ", incomingRefreshToken)
 
     try {
         const decoded = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
 
         // Find user by ID
         const user = await User.findById(decoded?.userId).select("-password");
-        console.log("\nuser: ", user)
 
         if (!user) {
-            throw new ApiError(401, "Unauthorized: User not found");
+            throw new ApiError(401, "User not found");
         }
 
-        console.log("\nuser token: ", user.refreshTokens);
+        console.log("👉 user controller :: Incoming refresh token: ", incomingRefreshToken);
+        console.log("👉 user controller :: user token in db: ", user.refreshTokens);
 
 
         if (String(user.refreshTokens) !== String(incomingRefreshToken)) {
-            console.log("not same")
             throw new ApiError(401, "Invalid refresh token");
         }
 
         // Generate new access token
         const { accessToken, refreshToken } = generateAccessAndRefreshTokens(user);
 
-        // res.status(200).json(new ApiResponse(200, "Access token refreshed successfully", { accessToken }));
+        // Update refresh token in DB
+        user.refreshTokens = refreshToken;
+        const newUserData = await user.save({ validateBeforeSave: false });
+
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: true,
@@ -224,7 +225,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
                 secure: true,
                 sameSite: "Strict"
             })
-            .status(200).json(new ApiResponse(200, "Access token refreshed successfully", { accessToken, refreshToken }));
+            .status(200).json(new ApiResponse(200, "Access token refreshed successfully", newUserData));
     } catch (error) {
         throw new ApiError(401, `Unauthorized: Invalid token - ${error?.message}`);
     }
@@ -264,7 +265,7 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 
 const getUser = asyncHandler(async (req, res) => {
-    console.log("Fetching user data:", req.user);
+    console.log("👉 user controller :: Fetching user data:", req.user);
     return res.status(200).json(
         new ApiResponse(200, "User fetched successfully", req.user)
     );

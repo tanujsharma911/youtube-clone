@@ -38,7 +38,8 @@ const Login = () => {
 
     if (res?.data) {
       // Handle successful login
-      login(res.data.user);
+      console.log("Login successful:", res.data);
+      login(res.data);
       navigate("/");
     } else {
       // Handle login error

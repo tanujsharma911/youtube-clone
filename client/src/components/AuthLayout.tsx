@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 import useAuth from "@/store/auth";
@@ -13,10 +13,12 @@ const AuthLayout = ({
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  if (authRequired && !user) {
-    navigate("/login");
-    return null;
-  }
+  useEffect(() => {
+    if (!user) return;
+    if (authRequired && !user.loggedIn) {
+      navigate("/login");
+    }
+  }, []);
 
   return <div>{children}</div>;
 };

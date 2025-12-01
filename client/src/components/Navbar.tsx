@@ -8,7 +8,7 @@ import {
 import { Link } from "react-router";
 import { Upload } from "lucide-react";
 
-import { useIsMobile } from "./hooks/use-mobile";
+import { useIsMobile } from "../hooks/use-mobile";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import useAuth from "@/store/auth";
 
@@ -16,8 +16,6 @@ const Navbar = () => {
   const isMobile = useIsMobile();
 
   const { user } = useAuth();
-
-  console.log("Navbar user:", user.loggedIn);
   return (
     <nav className="w-full h-14 border-b bg-white px-5 py-3 flex items-center justify-between sticky top-0 z-50">
       <h3 className="text-lg font-semibold">Youtube Clone</h3>
@@ -29,7 +27,7 @@ const Navbar = () => {
                 asChild
                 className={navigationMenuTriggerStyle()}
               >
-                <Link to="/upload">
+                <Link to="/v/upload">
                   <span className="flex items-center gap-2">
                     <Upload />
                     Upload Video
@@ -45,9 +43,12 @@ const Navbar = () => {
               >
                 <Link to="/account">
                   <Avatar>
-                    <AvatarImage src={user.data?.avatar} alt={user.data?.fullName} />
+                    <AvatarImage
+                      src={user?.data?.avatar}
+                      alt={user?.data?.fullName}
+                    />
                     <AvatarFallback>
-                      {user.data?.fullName.charAt(0)}
+                      {user?.data?.fullName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                 </Link>
