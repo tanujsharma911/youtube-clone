@@ -16,7 +16,7 @@ router.route("/").get(getAllVideos);
 
 router.route("/").post(
     verifyJWT,
-    upload("any").fields([
+    upload("both").fields([
         {
             name: "videoFile",
             maxCount: 1,

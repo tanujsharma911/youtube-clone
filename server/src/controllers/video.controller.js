@@ -15,7 +15,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
   // get all videos(thumbnail url, title, duration) based on query, sort, pagination
 
-  const filter = { visibility: true };
+  const filter = { visibility: "public" };
 
   if (userId) {
     if (!isValidObjectId(userId)) throw new ApiError(422, "userId is not valid");
@@ -89,10 +89,12 @@ const uploadVideo = asyncHandler(async (req, res) => {
   if (description?.length > 500) throw new ApiError(422, "Description can be maximum 500 character long");
 
   const videoPath = req.files?.videoFile?.[0]?.path;
+  console.log("👉 req.files: ", req.files);
   if (!videoPath) throw new ApiError(422, "Video file is required");
 
   const thumbnailPath = req.files?.thumbnail?.[0]?.path;
   if (!thumbnailPath) throw new ApiError(422, "Thumbnail file is required");
+  if (visibility !== "public" && visibility !== "private") throw new ApiError(422, "visibility must be public or private");
 
   console.log("All Validation passed ✅");
 

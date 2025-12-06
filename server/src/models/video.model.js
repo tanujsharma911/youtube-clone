@@ -32,8 +32,8 @@ const videoSchema = new mongoose.Schema(
             default: 0
         },
         visibility: {
-            type: Boolean,
-            default: true
+            type: String,
+            default: "public"
         },
         owner: {
             type: mongoose.Schema.Types.ObjectId,

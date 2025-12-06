@@ -10,6 +10,10 @@ const useAxiosPrivate = () => {
   useEffect(() => {
     const requestIntercept = axiosPrivate.interceptors.request.use(
       (config) => {
+        // Don't set Content-Type for FormData, let browser handle it
+        if (config.data instanceof FormData) {
+          delete config.headers["Content-Type"];
+        }
         return config;
       },
       (error) => Promise.reject(error)

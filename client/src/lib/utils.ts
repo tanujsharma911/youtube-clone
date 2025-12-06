@@ -9,11 +9,6 @@ export function cn(...inputs: ClassValue[]) {
 
 export const fetchVideos = async (): Promise<PaginatedVideoResponse> => {
   const videos = await axios.get("/api/videos").then((res) => res.data);
-  // await new Promise((resolve) =>
-  //   setTimeout(() => {
-  //     resolve(null);
-  //   }, 1000)
-  // ); // Simulate network delay
 
   return videos.data;
 };
