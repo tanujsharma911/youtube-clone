@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { XIcon } from "lucide-react";
 import { type ChangeEvent, useState } from "react";
 
-const ProfileImageCrop = ({ croppedImage, setCroppedImage }) => {
+const ProfileImageCrop = ({ croppedImage, setCroppedImage }: { croppedImage: string | null; setCroppedImage: (image: string | null) => void; }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {

@@ -34,12 +34,12 @@ const VideoCard = ({ video }: VideoCardProps) => {
           </Avatar>
           <div className="flex flex-col">
             <h3 className="text-md font-semibold">
-              {video?.title?.length > 50
+              { video?.title && video?.title?.length > 50
                 ? video?.title?.slice(0, 50) + "..."
                 : video?.title}
             </h3>
             <p className="mt-1 text-xs text-muted-foreground hover:text-foreground flex">
-              <span className="truncate">{video?.owner?.fullName?.length > 20 ? <>{video?.owner?.fullName?.slice(0, 20)}...</> : video?.owner?.fullName}</span>
+              <span className="truncate">{video?.owner?.fullName && video?.owner?.fullName?.length > 20 ? <>{video?.owner?.fullName?.slice(0, 20)}...</> : video?.owner?.fullName}</span>
               <span className="flex ml-1"> • {formattedDate}</span>
             </p>
           </div>
