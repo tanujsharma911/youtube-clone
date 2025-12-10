@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import axios from "axios";
+import axios from "../api/axios";
 import type { PaginatedVideoResponse } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const fetchVideos = async (): Promise<PaginatedVideoResponse> => {
-  const videos = await axios.get("/api/videos").then((res) => res.data);
+  const videos = await axios.get("/videos").then((res) => res.data);
 
   return videos.data;
 };
