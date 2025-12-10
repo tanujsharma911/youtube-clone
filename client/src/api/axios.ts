@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "https://youtube-clone-7ozu.onrender.com/api",
+  baseURL: "/api",
 });
 
 export const axiosPrivate = axios.create({
-  baseURL: "https://youtube-clone-7ozu.onrender.com/api",
+  baseURL: "/api",
   withCredentials: true,
 });
 
