@@ -11,6 +11,8 @@ function App() {
   const axiosPrivate = useAxiosPrivate();
   const { user, login } = useAuth();
 
+  console.log("VITE_SERVER at build:", import.meta.env.VITE_SERVER);
+
   const { isLoading } = useQuery({
     queryKey: ["userData"],
     queryFn: async () => {
