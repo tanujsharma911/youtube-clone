@@ -37,7 +37,9 @@ const Account = () => {
   };
 
   return isLoading ? (
-    <div className="flex justify-center items-center h-screen">Loading...</div>
+    <div className="flex flex-col justify-center items-center h-screen">
+      Loading...
+    </div>
   ) : (
     <div>
       <div className="flex items-center gap-5 justify-between">

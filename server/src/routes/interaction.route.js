@@ -5,11 +5,11 @@ import {
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const router = Router();
-router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
+// router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
-router.route("/toggle/v").post(toggleVideoInteraction);
-router.route("/toggle/c").post(toggleCommentInteraction);
-router.route("/videos").get(getLikedVideos);
+router.route("/toggle/v").post(verifyJWT, toggleVideoInteraction);
+router.route("/toggle/c").post(verifyJWT, toggleCommentInteraction);
+router.route("/videos").get(verifyJWT, getLikedVideos);
 router.route("/v").get(getVideoInteractions);
 
 export default router

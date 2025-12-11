@@ -87,6 +87,10 @@ const Video = () => {
 
   const makeVote = useMutation({
     mutationFn: async (vote: number) => {
+      if (user?.loggedIn === false) {
+        toast.error("You need to be logged in to vote.");
+        return;
+      }
       try {
         const response = await axiosPrivate.post(
           `interaction/toggle/v?videoId=${videoId}&action=${vote}`
@@ -246,9 +250,7 @@ const Video = () => {
         {/* Description */}
         <div className="mb-4 bg-gray-200 rounded-2xl border- p-4">
           <h4 className="font-semibold">Description</h4>
-          <p className="">
-            {video?.data?.description}
-          </p>
+          <p className="">{video?.data?.description}</p>
         </div>
 
         {/* Comments */}
@@ -256,37 +258,39 @@ const Video = () => {
           <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
             {comments?.data?.docs?.length || ""} Comments
           </h4>
-          <div className="flex w-full mt-5 items-start gap-2">
-            <Avatar>
-              <AvatarImage
-                src={user?.data?.avatar}
-                alt={user?.data?.fullName}
-              />
-              <AvatarFallback>
-                {user?.data?.fullName ? user?.data?.fullName[0] : null}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <Input
-                type="text"
-                placeholder="Comment"
-                className="border-0 shadow-none border-b rounded-none"
-                {...register("content", { required: true })}
-              />
-              {errors && errors.content && (
-                <p className="text-red-500 text-sm mt-2">
-                  Comment cannot be empty
-                </p>
-              )}
+          {user?.loggedIn === true && (
+            <div className="flex w-full mt-5 items-start gap-2">
+              <Avatar>
+                <AvatarImage
+                  src={user?.data?.avatar}
+                  alt={user?.data?.fullName}
+                />
+                <AvatarFallback>
+                  {user?.data?.fullName ? user?.data?.fullName[0] : null}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  placeholder="Comment"
+                  className="border-0 shadow-none border-b rounded-none"
+                  {...register("content", { required: true })}
+                />
+                {errors && errors.content && (
+                  <p className="text-red-500 text-sm mt-2">
+                    Comment cannot be empty
+                  </p>
+                )}
+              </div>
+              <Button
+                type="submit"
+                variant="outline"
+                onClick={handleSubmit(sendUserComment)}
+              >
+                Comment
+              </Button>
             </div>
-            <Button
-              type="submit"
-              variant="outline"
-              onClick={handleSubmit(sendUserComment)}
-            >
-              Comment
-            </Button>
-          </div>
+          )}
           {!comments.isPending && comments?.data && (
             <div className="flex flex-col gap-4 mt-10">
               {comments?.data?.docs?.map((comment: CommentType) => (
