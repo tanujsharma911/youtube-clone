@@ -5,7 +5,7 @@ const instance = axios.create({
 });
 
 export const axiosPrivate = axios.create({
-  baseURL: `${import.meta.env.VITE_SERVER}/api`,
+  baseURL: `${import.meta.env.VITE_SERVER ?? ""}/api`,
   withCredentials: true,
 });
 
