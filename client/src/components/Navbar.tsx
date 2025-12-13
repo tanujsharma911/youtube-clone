@@ -19,7 +19,7 @@ const Navbar = () => {
   return (
     <nav className="w-full h-14 border-b bg-white px-5 py-3 flex items-center justify-between sticky top-0 z-50">
       <Link to="/">
-        <h3 className="text-lg font-semibold">Youtube Clone</h3>
+        <h3 className="text-lg font-semibold">Video Streaming</h3>
       </Link>
       <NavigationMenu viewport={isMobile}>
         {user.loggedIn ? (

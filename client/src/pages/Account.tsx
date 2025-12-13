@@ -32,10 +32,6 @@ const Account = () => {
     navigation("/");
   };
 
-  const handleEditProfile = async () => {
-    // Implement edit profile functionality
-  };
-
   return isLoading ? (
     <div className="flex flex-col justify-center items-center h-screen">
       Loading...
@@ -54,9 +50,6 @@ const Account = () => {
           </div>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={handleEditProfile}>
-            Edit Profile
-          </Button>
           <Button variant="outline" onClick={handleLogout}>
             Logout
           </Button>

@@ -11,8 +11,6 @@ function App() {
   const axiosPrivate = useAxiosPrivate();
   const { user, login } = useAuth();
 
-  console.log("VITE_SERVER at build:", import.meta.env.VITE_SERVER);
-
   const { isLoading } = useQuery({
     queryKey: ["userData"],
     queryFn: async () => {
@@ -24,7 +22,7 @@ function App() {
         const res = await axiosPrivate.get("/users/get-user", {
           withCredentials: true,
         });
-        console.log("App :: User data:", res.data);
+        console.log("App :: User looged in successfully");
         login(res.data.data);
         return res.data.data;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
