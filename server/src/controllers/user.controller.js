@@ -149,7 +149,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: "Strict"
+        sameSite: "none"
     }
     res.cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
@@ -172,7 +172,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: "Strict"
+        sameSite: "none"
     };
 
     // removes a cookie from the user's browser
