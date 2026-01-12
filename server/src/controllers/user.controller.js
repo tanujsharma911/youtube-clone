@@ -6,6 +6,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { User } from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import mongoose from "mongoose";
+import { cookieOptions } from "../constants.js";
 
 
 const generateAccessAndRefreshTokens = (user) => {
@@ -145,14 +146,8 @@ const loginUser = asyncHandler(async (req, res) => {
     delete user._doc.password;
     delete user._doc.refreshTokens;
 
-    // send response with user data (without password) and tokens in cookies
-    const options = {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none"
-    }
-    res.cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
+    res.cookie("accessToken", accessToken, cookieOptions)
+        .cookie("refreshToken", refreshToken, cookieOptions)
         .status(200).json(new ApiResponse(200, "Login successful", user));
 
 });
@@ -169,16 +164,10 @@ const logoutUser = asyncHandler(async (req, res) => {
         }
     );
 
-    const options = {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none"
-    };
-
     // removes a cookie from the user's browser
     res.status(200)
-        .clearCookie("accessToken", options)
-        .clearCookie("refreshToken", options)
+        .clearCookie("accessToken", cookieOptions)
+        .clearCookie("refreshToken", cookieOptions)
         .json(new ApiResponse(200, "Logout successful"));
 });
 
@@ -211,16 +200,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         user.refreshTokens = refreshToken;
         const newUserData = await user.save({ validateBeforeSave: false });
 
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none"
-        })
-            .cookie("refreshToken", refreshToken, {
-                httpOnly: true,
-                secure: true,
-                sameSite: "none"
-            })
+        res.cookie("accessToken", accessToken, cookieOptions)
+            .cookie("refreshToken", refreshToken, cookieOptions)
             .status(200).json(new ApiResponse(200, "Access token refreshed successfully", newUserData));
     } catch (error) {
         throw new ApiError(401, `Unauthorized: Invalid token - ${error?.message}`);

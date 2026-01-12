@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import axios from "../api/axios";
+import { axiosPrivate } from "../api/axios";
 import useAuth from "@/store/auth";
 import { AxiosError } from "axios";
 
@@ -39,7 +39,7 @@ const Login = () => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      const res = await axios
+      const res = await axiosPrivate
         .post("/users/login", data)
         .then((res) => res.data);
 
