@@ -214,12 +214,12 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: true,
-            sameSite: "Strict"
+            sameSite: "none"
         })
             .cookie("refreshToken", refreshToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "Strict"
+                sameSite: "none"
             })
             .status(200).json(new ApiResponse(200, "Access token refreshed successfully", newUserData));
     } catch (error) {
